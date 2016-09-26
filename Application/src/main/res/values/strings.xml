@@ -33,4 +33,6 @@
     <string name="menu_disconnect">Disconnect</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_stop">Stop</string>
+    <string name="permission_denied">This app can\'t work without this permission</string>
+    <string name="permission_granted">Ok, permission granted</string>
 </resources>
