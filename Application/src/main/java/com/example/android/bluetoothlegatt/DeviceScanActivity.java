@@ -17,15 +17,19 @@
 package com.example.android.bluetoothlegatt;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +41,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import android.support.v4.app.ActivityCompat;
+
+import static android.R.attr.duration;
 
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
@@ -48,12 +55,69 @@ public class DeviceScanActivity extends ListActivity {
     private Handler mHandler;
 
     private static final int REQUEST_ENABLE_BT = 1;
+    private static final int PERMISSION_REQUST_ACCESS_FINE_LOCATION = 1001;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
+    public boolean hasPermission(String permission)
+    {
+        Context applicationContext = this.getApplicationContext();
+        Application application = this.getApplication();
+        PackageManager packagemanager = this.getPackageManager();
+        applicationContext.checkSelfPermission("");
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), PackageManager.GET_PERMISSIONS);
+            if (info.requestedPermissions != null) {
+                for (String p : info.requestedPermissions) {
+                    Log.d("ListPermissions", p);
+                    if (p.equals(permission)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Toast toast = Toast.makeText(getApplicationContext(),R.string.permission_granted, Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+
+                    // permission denied, boo! Disable the
+                    Log.d("Info", "Pemission denied android.permission.ACCESS_FINE_LOCATION");
+                    Toast toast = Toast.makeText(getApplicationContext(),R.string.permission_denied, Toast.LENGTH_LONG);
+                    toast.show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!hasPermission("android.permission.ACCESS_FINE_LOCATION")) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{"android.permission.ACCESS_FINE_LOCATION"},
+                        PERMISSION_REQUST_ACCESS_FINE_LOCATION);
+
+            } else
+                Log.d("Info", "Has android.permission.ACCESS_FINE_LOCATION");
+        }
         getActionBar().setTitle(R.string.title_devices);
         mHandler = new Handler();
 

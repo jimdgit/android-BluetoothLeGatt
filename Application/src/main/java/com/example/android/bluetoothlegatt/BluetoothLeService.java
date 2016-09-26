@@ -28,12 +28,16 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import java.util.List;
 import java.util.UUID;
+import android.content.pm.PackageInfo;
+import android.content.Context;
+import java.util.jar.Manifest;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
@@ -180,6 +184,8 @@ public class BluetoothLeService extends Service {
      * @return Return true if the initialization is successful.
      */
     public boolean initialize() {
+
+        // Assume thisActivity is the current activity
         // For API level 18 and above, get a reference to BluetoothAdapter through
         // BluetoothManager.
         if (mBluetoothManager == null) {
